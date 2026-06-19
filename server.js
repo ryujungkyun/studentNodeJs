@@ -123,7 +123,12 @@ app.get("/students", async function (request, response, next) {
     // 1. students table에서 id, name, score를 조회합니다.
     // 2. id 오름차순으로 정렬합니다.
     // 3. rows를 response.json(rows)로 응답합니다.
-    sendTodo(response, "GET /students");
+
+    const [rows] = await pool.query(
+      "SELECT id, name, score FROM students ORDER BY id ASC"
+    );
+
+    response.json(rows);
   } catch (error) {
     next(error);
   }
