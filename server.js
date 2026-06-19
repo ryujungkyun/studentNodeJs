@@ -138,12 +138,25 @@ app.post("/students", async function (request, response, next) {
   try {
     // TODO:
     // 1. readStudentBody(request.body)로 body를 검사합니다.
+    const student = readStudentBody(request.body);
     // 2. 올바르지 않으면 400으로 응답합니다.
+    if(student === null) {
+      response.status(400).json({
+        message: "학생 정보가 올바르지 않습니다.",
+      });
+      return;
+    }
     // 3. INSERT로 학생을 추가합니다.
+    const [result] = await pool.query(
+      "INSERT INTO students (name, score) VALUES (?, ?)",
+      [student.name, student.score]
+    );
     // 4. result.insertId로 새 학생 id를 확인합니다.
+    const newStudentId = result.insertId;
     // 5. findStudentById(id)로 새 학생을 다시 조회합니다.
+    const newStudent = await findStudentById(newStudentId);
     // 6. status 201과 함께 새 학생 객체를 응답합니다.
-    sendTodo(response, "POST /students");
+    response.status(201).json(newStudent);
   } catch (error) {
     next(error);
   }
